@@ -4,6 +4,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import { getUrgency } from "../lib/urgency";
 import useInstallPrompt from "../lib/useInstallPrompt";
+import UrgentTicker from "../components/UrgentTicker";
 
 export default function Home() {
   const [tasks, setTasks] = useState([]);
@@ -57,6 +58,8 @@ export default function Home() {
           </nav>
         </div>
       </div>
+
+      <UrgentTicker tasks={tasks} />
 
       <div className="container">
         {canInstall && !isInstalled && (
