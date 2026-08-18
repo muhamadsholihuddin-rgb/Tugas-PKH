@@ -1,0 +1,14 @@
+{
+  "name": "Tugas & Jurnal Pendamping PKH",
+  "short_name": "Tugas PKH",
+  "description": "Daftar tugas dan jurnal kegiatan pendamping PKH Kabupaten Kediri",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F3F5F1",
+  "theme_color": "#145C4B",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
