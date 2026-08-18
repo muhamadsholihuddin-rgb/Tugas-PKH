@@ -1,6 +1,6 @@
 // Naikkan angka versi ini SETIAP KALI kamu deploy perubahan, supaya HP
 // pengguna otomatis buang cache lama dan ambil versi baru.
-const CACHE_NAME = "tugas-pkh-v2";
+const CACHE_NAME = "tugas-pkh-v3";
 const CORE_ASSETS = ["/", "/jurnal", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
