@@ -1,3 +1,21 @@
+// Tambahkan di bagian atas file (imports)
+import TickerControl from "../components/TickerControl";
+
+// Tambahkan di dalam component Admin, misalnya setelah bagian "Tambah Tugas"
+export default function Admin() {
+  // ... kode existing ...
+  
+  return (
+    <>
+      {/* Kode existing */}
+      
+      <section>
+        <h2>Pengaturan Aplikasi</h2>
+        <TickerControl />  {/* ← Tambahkan di sini */}
+      </section>
+    </>
+  );
+}
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
