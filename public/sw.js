@@ -1,4 +1,6 @@
-const CACHE_NAME = "tugas-pkh-v1";
+// Naikkan angka versi ini SETIAP KALI kamu deploy perubahan, supaya HP
+// pengguna otomatis buang cache lama dan ambil versi baru.
+const CACHE_NAME = "tugas-pkh-v2";
 const CORE_ASSETS = ["/", "/jurnal", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -17,9 +19,36 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Strategi: network-first untuk halaman (HTML/navigasi) supaya user SELALU
+// dapat versi terbaru saat online, cache cuma dipakai sebagai fallback saat
+// offline. Aset statis (gambar, ikon, dll) tetap cache-first agar tetap cepat.
 self.addEventListener("fetch", (event) => {
+  const { request } = event;
+
+  // Untuk permintaan halaman (navigasi), coba jaringan dulu.
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("/")))
+    );
+    return;
+  }
+
+  // Untuk aset lain (JS, CSS, gambar, dll), cache-first seperti biasa.
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        return response;
+      });
+    })
   );
 });
 
