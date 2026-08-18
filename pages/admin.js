@@ -14,6 +14,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 
@@ -27,6 +28,7 @@ export default function Admin() {
   const [tasks, setTasks] = useState([]);
   const [form, setForm] = useState({ title: "", link: "", target: "", deadline: "" });
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
@@ -51,7 +53,7 @@ export default function Admin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
-      setLoginError("Error: " + err.code);
+      setLoginError("Email atau kata sandi salah.");
     }
   };
 
@@ -60,23 +62,45 @@ export default function Admin() {
     if (!form.title || !form.deadline) return;
     setSaving(true);
     try {
-      await addDoc(collection(db, "tasks"), {
-        ...form,
-        notifiedH1: false,
-        notifiedH0: false,
-        createdAt: serverTimestamp(),
-      });
+      if (editingId) {
+        await updateDoc(doc(db, "tasks", editingId), { ...form });
+        setEditingId(null);
+      } else {
+        await addDoc(collection(db, "tasks"), {
+          ...form,
+          notifiedH1: false,
+          notifiedH0: false,
+          createdAt: serverTimestamp(),
+        });
+      }
       setForm({ title: "", link: "", target: "", deadline: "" });
     } catch (err) {
       console.error(err);
-      alert("Gagal menyimpan tugas.");
+      alert(editingId ? "Gagal menyimpan perubahan." : "Gagal menyimpan tugas.");
     } finally {
       setSaving(false);
     }
   };
 
+  const handleEdit = (task) => {
+    setEditingId(task.id);
+    setForm({
+      title: task.title || "",
+      link: task.link || "",
+      target: task.target || "",
+      deadline: task.deadline || "",
+    });
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setForm({ title: "", link: "", target: "", deadline: "" });
+  };
+
   const handleDelete = async (id) => {
     if (!confirm("Hapus tugas ini?")) return;
+    if (editingId === id) handleCancelEdit();
     await deleteDoc(doc(db, "tasks", id));
   };
 
@@ -115,6 +139,27 @@ export default function Admin() {
       </div>
 
       <form onSubmit={handleAddTask} className="card" style={{ marginTop: 20 }}>
+        {editingId && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "var(--amber-soft)",
+              color: "var(--pine-deep)",
+              borderRadius: 10,
+              padding: "8px 12px",
+              fontSize: 12.5,
+              fontWeight: 600,
+              marginBottom: 14,
+            }}
+          >
+            <span>Sedang mengedit tugas</span>
+            <button type="button" className="btn btn-ghost" style={{ padding: "4px 10px" }} onClick={handleCancelEdit}>
+              Batal
+            </button>
+          </div>
+        )}
         <div className="field">
           <label>Judul Tugas</label>
           <input className="input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
@@ -132,7 +177,7 @@ export default function Admin() {
           <input className="input" type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} required />
         </div>
         <button className="btn btn-primary" type="submit" disabled={saving} style={{ width: "100%" }}>
-          {saving ? "Menyimpan…" : "Tambah Tugas"}
+          {saving ? "Menyimpan…" : editingId ? "Simpan Perubahan" : "Tambah Tugas"}
         </button>
       </form>
 
@@ -143,7 +188,10 @@ export default function Admin() {
               <h3 style={{ margin: 0, fontSize: 15 }}>{t.title}</h3>
               <p className="task-meta mono">{t.deadline}</p>
             </div>
-            <button className="btn btn-ghost" onClick={() => handleDelete(t.id)}>Hapus</button>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <button className="btn btn-ghost" onClick={() => handleEdit(t)}>Edit</button>
+              <button className="btn btn-ghost" onClick={() => handleDelete(t.id)}>Hapus</button>
+            </div>
           </div>
         ))}
       </div>
