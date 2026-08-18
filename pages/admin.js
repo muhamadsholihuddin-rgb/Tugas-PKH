@@ -51,8 +51,7 @@ export default function Admin() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
-      setLoginError("Error: " + err.code + " - " + err.message);
-    }
+      setLoginError("Error: " + err.code);
     }
   };
 
