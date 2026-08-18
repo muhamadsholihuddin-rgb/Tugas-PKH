@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Tugas: siapa saja bisa baca (termasuk pendamping tanpa login),
+    // tapi hanya user yang sudah login (admin) yang boleh tulis/hapus.
+    match /tasks/{taskId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.firebase.sign_in_provider == "password";
+    }
+
+    // Jurnal: siapa saja yang sudah dapat sesi (termasuk anonim) boleh baca & tulis.
+    // Pemisahan antar pendamping dilakukan di level aplikasi lewat field pendampingName.
+    match /journal/{entryId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Token push notification per device
+    match /subscriptions/{subId} {
+      allow read: if false;
+      allow write: if request.auth != null;
+    }
+  }
+}
