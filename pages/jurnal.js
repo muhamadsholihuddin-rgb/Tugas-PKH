@@ -7,6 +7,7 @@ import { RHK_CONFIG } from "../data/rhkConfig";
 import useIdentity from "../lib/useIdentity";
 import { loadLocalEntries, saveLocalEntry, removeLocalEntry } from "../lib/journalLocal";
 import StyledSelect from "../components/StyledSelect";
+import { toTitleCase } from "../lib/textCase";
 
 const today = () => new Date().toISOString().split("T")[0];
 
@@ -218,7 +219,7 @@ export default function Jurnal() {
               <label>Kategori RHK</label>
               <StyledSelect
                 value={form.rhkId}
-                options={RHK_CONFIG.map((r) => ({ value: r.id, label: `RHK ${r.id}: ${r.title}` }))}
+                options={RHK_CONFIG.map((r) => ({ value: r.id, label: `RHK ${r.id}: ${toTitleCase(r.title)}` }))}
                 onChange={(id) => {
                   const opts = RHK_CONFIG.find((r) => r.id === id)?.options || [];
                   setForm({ ...form, rhkId: id, workPlan: opts[0] });
