@@ -359,6 +359,81 @@ label {
 }
 .empty-state svg { margin-bottom: 10px; }
 
+/* ================================================================ */
+/* ✨ RUNNING TEXT TUGAS MENDEKATI DEADLINE — UKURAN BESAR MENONJOL */
+/* ================================================================ */
+
+.ticker {
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--brick) 0%, #A2332A 100%);
+  border-radius: 16px;
+  margin: 20px 0 24px;
+  box-shadow: 
+    0 12px 32px -8px rgba(178, 58, 47, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  /* Subtle animation pulse untuk menarik perhatian */
+  animation: ticker-pulse 2s ease-in-out infinite;
+}
+
+@keyframes ticker-pulse {
+  0%, 100% { box-shadow: 
+    0 12px 32px -8px rgba(178, 58, 47, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 
+    0 16px 42px -6px rgba(178, 58, 47, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker-scroll 28s linear infinite;
+}
+
+.ticker:hover .ticker-track { 
+  animation-play-state: paused; 
+}
+
+.ticker-content {
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 18px 0;
+  padding-right: 60px;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #FFFFFF;
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+  .ticker-content { animation: none; }
+  .ticker { overflow-x: auto; animation: none; }
+}
+
+/* Responsive: ukuran sedikit lebih kecil di mobile */
+@media (max-width: 480px) {
+  .ticker-content {
+    font-size: 16px;
+    padding: 16px 0;
+    padding-right: 50px;
+  }
+  .ticker {
+    margin: 16px 0 20px;
+    border-radius: 14px;
+  }
+}
+
 /* ---------------------------------------------------------------- */
 /* Banner "Pasang di HP kamu"                                        */
 /* ---------------------------------------------------------------- */
@@ -475,6 +550,86 @@ label {
   transition: all 0.15s;
 }
 .link-btn:hover { background: var(--pine); color: #fff; }
+
+/* ================================================================ */
+/* ADMIN TICKER CONTROL — Modal untuk mengatur custom text          */
+/* ================================================================ */
+
+.ticker-control-modal {
+  background: var(--paper-raised);
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.ticker-control-modal h3 {
+  font-size: 17px;
+  margin: 0 0 4px;
+  color: var(--pine-deep);
+}
+
+.ticker-control-modal p {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.ticker-control-modal .field {
+  margin-bottom: 14px;
+}
+
+.ticker-control-modal label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.ticker-control-modal textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.ticker-control-modal .btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ticker-control-modal .btn-row .btn {
+  flex: 1;
+}
+
+.ticker-info {
+  background: #FFFBF0;
+  border-left: 3px solid var(--amber);
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: #8A5420;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.ticker-preview {
+  background: var(--brick);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ---------------------------------------------------------------- */
 /* Jurnal — kartu formulir & linimasa catatan harian                 */
