@@ -1,16 +1,31 @@
 import { useEffect, useState } from "react";
+import { doc, getDoc, setDoc, deleteField } from "firebase/firestore";
+import { db } from "../lib/firebase";
 
-// Komponen ini ditambahkan di halaman Admin untuk mengelola custom text di ticker
-// Letakkan di file pages/admin.js atau buat file terpisah di components/
+// Komponen ini ditambahkan di halaman Admin untuk mengelola custom text di ticker.
+// Custom text disimpan di Firestore (dokumen settings/ticker), BUKAN localStorage,
+// supaya pesan yang disimpan admin di satu device langsung terlihat oleh semua
+// user di device/browser manapun yang membuka halaman Tugas.
+const TICKER_DOC = doc(db, "settings", "ticker");
+
 export default function TickerControl() {
   const [customText, setCustomText] = useState("");
   const [savedStatus, setSavedStatus] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load custom text dari localStorage saat component mount
+  // Load custom text dari Firestore saat component mount
   useEffect(() => {
-    const saved = localStorage.getItem("tickerCustomText") || "";
-    setCustomText(saved);
+    (async () => {
+      try {
+        const snap = await getDoc(TICKER_DOC);
+        setCustomText(snap.exists() ? snap.data().customText || "" : "");
+      } catch (err) {
+        console.error("Gagal memuat pesan ticker:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   // Handle perubahan input
@@ -20,24 +35,31 @@ export default function TickerControl() {
   };
 
   // Handle save
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    // Simulating save delay (bisa di-replace dengan API call jika perlu)
-    setTimeout(() => {
-      localStorage.setItem("tickerCustomText", customText);
-      setIsSaving(false);
+    try {
+      await setDoc(TICKER_DOC, { customText }, { merge: true });
       setSavedStatus(true);
-      // Auto-hide status message setelah 3 detik
       setTimeout(() => setSavedStatus(false), 3000);
-    }, 500);
+    } catch (err) {
+      console.error("Gagal menyimpan pesan ticker:", err);
+      alert("Gagal menyimpan pesan. Coba lagi.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Handle clear
-  const handleClear = () => {
+  const handleClear = async () => {
     if (confirm("Hapus custom text dari ticker?")) {
-      setCustomText("");
-      localStorage.removeItem("tickerCustomText");
-      setSavedStatus(false);
+      try {
+        await setDoc(TICKER_DOC, { customText: deleteField() }, { merge: true });
+        setCustomText("");
+        setSavedStatus(false);
+      } catch (err) {
+        console.error("Gagal menghapus pesan ticker:", err);
+        alert("Gagal menghapus pesan. Coba lagi.");
+      }
     }
   };
 
@@ -57,6 +79,7 @@ export default function TickerControl() {
           placeholder="Contoh: Tutup laporan minggu ini sebelum Jumat jam 5 sore"
           value={customText}
           onChange={handleChange}
+          disabled={isLoading}
         />
         <div className="ticker-info">
           💡 Tinggalkan kosong jika tidak ada pesan darurat. 
@@ -82,7 +105,7 @@ export default function TickerControl() {
         <button 
           className="btn btn-primary"
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || isLoading}
         >
           {isSaving ? "Menyimpan..." : "💾 Simpan Pesan"}
         </button>
@@ -139,7 +162,7 @@ export default function TickerControl() {
           <li>Gunakan kalimat singkat & jelas (max 80 karakter)</li>
           <li>Hindari karakter spesial yang bisa menyebabkan error</li>
           <li>Pesan akan muncul di depan list tugas mendesak</li>
-          <li>Perbarui kapan saja, perubahan langsung terlihat</li>
+          <li>Perbarui kapan saja, perubahan langsung terlihat di semua device</li>
         </ul>
       </div>
     </div>
