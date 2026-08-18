@@ -1,21 +1,3 @@
-// Tambahkan di bagian atas file (imports)
-import TickerControl from "../components/TickerControl";
-
-// Tambahkan di dalam component Admin, misalnya setelah bagian "Tambah Tugas"
-export default function Admin() {
-  // ... kode existing ...
-  
-  return (
-    <>
-      {/* Kode existing */}
-      
-      <section>
-        <h2>Pengaturan Aplikasi</h2>
-        <TickerControl />  {/* ← Tambahkan di sini */}
-      </section>
-    </>
-  );
-}
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -35,6 +17,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
+import TickerControl from "../components/TickerControl";
 
 export default function Admin() {
   const [user, setUser] = useState(null);
@@ -154,6 +137,11 @@ export default function Admin() {
           <h1 className="display" style={{ margin: "4px 0 0" }}>Kelola Tugas</h1>
         </div>
         <button className="btn btn-ghost" onClick={() => signOut(auth)}>Keluar</button>
+      </div>
+
+      {/* Pesan darurat / custom text untuk running text di halaman Tugas */}
+      <div style={{ marginTop: 20 }}>
+        <TickerControl />
       </div>
 
       <form onSubmit={handleAddTask} className="card" style={{ marginTop: 20 }}>
