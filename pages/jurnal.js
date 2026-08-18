@@ -6,6 +6,7 @@ import { auth, db } from "../lib/firebase";
 import { RHK_CONFIG } from "../data/rhkConfig";
 import useIdentity from "../lib/useIdentity";
 import { loadLocalEntries, saveLocalEntry, removeLocalEntry } from "../lib/journalLocal";
+import StyledSelect from "../components/StyledSelect";
 
 const today = () => new Date().toISOString().split("T")[0];
 
@@ -215,26 +216,22 @@ export default function Jurnal() {
             </div>
             <div className="field">
               <label>Kategori RHK</label>
-              <select
+              <StyledSelect
                 value={form.rhkId}
-                onChange={(e) => {
-                  const id = Number(e.target.value);
+                options={RHK_CONFIG.map((r) => ({ value: r.id, label: `RHK ${r.id}: ${r.title}` }))}
+                onChange={(id) => {
                   const opts = RHK_CONFIG.find((r) => r.id === id)?.options || [];
                   setForm({ ...form, rhkId: id, workPlan: opts[0] });
                 }}
-              >
-                {RHK_CONFIG.map((r) => (
-                  <option key={r.id} value={r.id}>RHK {r.id}: {r.title}</option>
-                ))}
-              </select>
+              />
             </div>
             <div className="field">
               <label>Kegiatan Spesifik</label>
-              <select value={form.workPlan} onChange={(e) => setForm({ ...form, workPlan: e.target.value })}>
-                {rhkOptions.map((o) => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
-              </select>
+              <StyledSelect
+                value={form.workPlan}
+                options={rhkOptions.map((o) => ({ value: o, label: o }))}
+                onChange={(val) => setForm({ ...form, workPlan: val })}
+              />
             </div>
             <div className="field-row">
               <div className="field">
